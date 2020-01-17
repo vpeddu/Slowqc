@@ -24,4 +24,4 @@ The required reference sequences for the `bowtie2`  alignment and adapters.fa fo
 
 
 ### Example command: 
-`python slowqc_test.py --trimmomatic "-phred33 -threads 40 ILLUMINACLIP:adapters.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:75" --kallisto "-i ~/bin/homo_sapiens/transcriptome.idx --threads 40" --debrowser True`
+`python slowqc.py --trimmomatic "-phred33 -threads 40 ILLUMINACLIP:adapters.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:75" --kallisto "-i ~/bin/homo_sapiens/transcriptome.idx --threads 40" --debrowser True`
