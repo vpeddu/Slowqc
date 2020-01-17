@@ -20,3 +20,7 @@ The required reference sequences for the `bowtie2`  alignment and adapters.fa fo
 * --trimmomatic "< Any Trimmomatic options to be entered after the 'trimmomatic PE' command>" 
 * --kallisto "<Any Kallisto options to be entered following 'kallisto quant'>" 
 * --Debrowser <True/False>
+
+
+### Example command: 
+`python slowqc_test.py --trimmomatic "-phred33 -threads 40 ILLUMINACLIP:adapters.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:75" --kallisto "-i ~/bin/homo_sapiens/transcriptome.idx --threads 40" --debrowser True`
