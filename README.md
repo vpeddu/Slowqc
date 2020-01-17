@@ -20,6 +20,7 @@ The required reference sequences for the `bowtie2`  alignment and adapters.fa fo
 * --trimmomatic "< Any Trimmomatic options to be entered after the 'trimmomatic PE' command>" 
 * --kallisto "<Any Kallisto options to be entered following 'kallisto quant'>" 
 * --Debrowser <True/False>
+* --fastqc <True/False> 
 
 
 ### Example command: 
