@@ -44,7 +44,7 @@ args = parser.parse_args()
 #Run Trimmomatic
 if(args.trimmomatic):
 	#download adapters.fa from github
-	url = "https://github.com/vpeddu/Bioinformatics-scripts/raw/master/slowqc/adapters.fa"
+	url = "https://github.com/vpeddu/Slowqc/raw/master/bin/adapters.fa"
 	filename, headers = urllib.request.urlretrieve(url, filename="adapters.fa")
 	trimmed_read_count = []
 	trimmed_read_count.append('Trimmed read count')
