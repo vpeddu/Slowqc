@@ -4,7 +4,7 @@ RNAseq Pipeline to go from raw Fastq files to DEBrowser/iDEP ready input
 This pipeline accepts untrimmed FASTQ files and performs the following: 
 * Quality and adapter trimming using `Trimmomatic` 
 * Transcript abundance quantification using Kallisto 
-* Alignment and quantification to Human mitochondrial, and ribosomal sequences (5.8s, 18s, 28s) using  `bowtie2` 
+* Alignment and quantification to Human mitochondrial, and ribosomal sequences (5.8s, 18s, 28s) using  `Bowtie2` 
 * Generate FASTQC output 
 * Returns a csv with read counts of the original FASTQ file, reads aligning to the ribosome and mitochondrial sequences, and mapped reads to the Human transcriptome. 
 
