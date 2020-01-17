@@ -233,6 +233,7 @@ if args.debrowser:
 	tsv_cmd = 'mkdir kallisto_tsvs ; for i in `find . -name *.tsv`; do  temp=`echo $i | cut -d / -f2`; newfilename="$temp"".tsv"; cp $temp/abundance.tsv kallisto_tsvs/$newfilename; done'
 	subprocess.call(tsv_cmd, shell = True, stderr = subprocess.DEVNULL)
 	subprocess.call('rscript --vanilla kallisto_to_debrowser.r kallisto_tsvs/', shell = True , stderr = subprocess.DEVNULL)
+	subprocess.call("sed 's/\"//g' DEBrowser_input.txt", shell = True)
 
 
 
