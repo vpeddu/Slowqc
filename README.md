@@ -1,7 +1,7 @@
 # Slowqc
-RNAseq Pipeline to go from raw Fastq files to DEBrowser/iDEP ready input
+RNAseq Pipeline to qc RNAseq FASTQ files with options for trimming, assembly, and export to iDEP/DEBrowser ready input. 
 
-This pipeline accepts untrimmed FASTQ files and performs the following: 
+This script accepts untrimmed FASTQ files and performs the following: 
 * Quality and adapter trimming using `Trimmomatic` 
 * Transcript abundance quantification using Kallisto 
 * Alignment and quantification to Human mitochondrial, and ribosomal sequences (5.8s, 18s, 28s) using  `Bowtie2` 
@@ -10,7 +10,7 @@ This pipeline accepts untrimmed FASTQ files and performs the following:
 
 ## Running the pipeline 
 
-All paired end FASTQ files in the folder with the python script will be run through the pipeline. Wildcard searches are used to distinguish R1 and R2 files, so they must have "R1" and "R2" in their filenames. `Trimmomatic` and `Bowtie2` must be installed and added to `$PATH`. 
+All paired end FASTQ files in the folder with the python script will be run through the pipeline. Wildcard searches are used to distinguish R1 and R2 files, so they must have "R1" and "R2" in their filenames. `Trimmomatic`, `Bowtie2`, `Kallisto`, and `SPADES` must be installed and added to `$PATH`. The python script pulls from NCBI and the bin folder located inside this repo 
 
 #### *If all of this is fine all you have to do is place the python script in the folder of FASTQ files* 
 
