@@ -31,11 +31,14 @@ logging.info(r2_fastqs)
 
 #Parse arguments 
 parser = argparse.ArgumentParser(description = "input trimmomatic flags")
+parser.add_argument("--paired", dest = 'paired', type = bool, help = "Option for paired end reads")
+parser.add_argument("--spades", dest = 'spades' ,type=bool,  help = "Input all flags after SPADES.py enclosed in double quotes here")
 parser.add_argument("--trimmomatic", dest='trimmomatic',nargs = '?' ,type=str, 
 	help="Input flags after 'trimmomatic PE' enclosed in double quotes \
 	excluding the filenames. Adapter file must be named adapters.fa. This will \
 	automatically download from github")
-parser.add_argument("--kallisto", dest = 'kallisto',type = str, help = "Input all flags after 'kallisto_quant' enclosed in double quotes")
+parser.add_argument("--kallisto", dest = 'kallisto',type = str, help = "Input all flags after 'kallisto_quant' enclosed in double quotes here \
+	IMPORTANT: if single end you must supply -l and -s arguments for kallisto here- the pipeline will break if you do not")
 parser.add_argument("--debrowser", dest = 'debrowser', type = bool, help = "Takes kallisto output and rewrites as debrowser ready input file")
 parser.add_argument("--fastqc", dest = 'fastqc', type = bool, help = "Runs fastqc on all trimmed files")
 
@@ -53,11 +56,13 @@ if(args.trimmomatic):
 		fq_name = (r1_fastqs[fq].split('_R')[0])
 		print('Trimming ' + fq_name)
 		trim_r1_name = 'trimmed.' + r1_fastqs[fq]
-		trim_r2_name = 'trimmed.' + r2_fastqs[fq]
-		trimmomatic_cmd = 'trimmomatic PE ' + ' ' + r1_fastqs[fq] + ' ' + r2_fastqs[fq] + ' ' + trim_r1_name + ' /dev/null/ ' + trim_r2_name + ' /dev/null/ ' + args.trimmomatic
-		logging.info(trimmomatic_cmd)
+		if(args.paired):
+			trim_r2_name = 'trimmed.' + r2_fastqs[fq]
+			trimmomatic_cmd = 'trimmomatic PE ' + ' ' + r1_fastqs[fq] + ' ' + r2_fastqs[fq] + ' ' + trim_r1_name + ' /dev/null/ ' + trim_r2_name + ' /dev/null/ ' + args.trimmomatic
+		else:
+			trimmomatic_cmd = 'trimmomatic SE ' + ' ' + r1_fastqs[fq] + ' ' + trim_r1_name  + ' ' + args.trimmomatic
 		subprocess.call(trimmomatic_cmd, shell = True, stderr = subprocess.DEVNULL, stdout = subprocess.DEVNULL)
-
+		logging.info(trimmomatic_cmd)
 	#Redefining fastq list so everything below works off of the trimmed files 
 	trimmed_files = fnmatch.filter(os.listdir(), 'trimmed.*')
 	r1_fastqs = fnmatch.filter(trimmed_files, '*R1*')
@@ -73,12 +78,30 @@ if(args.kallisto):
 		fq_name = (r1_fastqs[fq].split('_R')[0])
 		fq_name = fq_name.split('trimmed.')[1]
 		print('Running Kallisto for ' + fq_name)
-		kallisto_cmd = 'kallisto quant ' + args.kallisto + " -o " + fq_name + ' ' + r1_fastqs[fq] + ' ' + r2_fastqs[fq]
+		if args.paired: 
+			kallisto_cmd = 'kallisto quant ' + args.kallisto + " -o " + fq_name + ' ' + r1_fastqs[fq] + ' ' + r2_fastqs[fq]
+		else: 
+			kallisto_cmd = 'kallisto quant --single ' + args.kallisto + " -o " + fq_name + ' ' + r1_fastqs[fq] 
 		logging.info(kallisto_cmd)
 		subprocess.call(kallisto_cmd, shell = True, stderr = subprocess.DEVNULL, stdout = subprocess.DEVNULL)
 		count_cmd = "awk '{total = total + $4}END{print total}' " + fq_name + '/abundance.tsv'
 		kallisto_mapped_read_count.append((subprocess.check_output(count_cmd, shell = True).decode('utf-8').strip()))
-	
+
+#Run SPADES
+if(args.spades):
+	print('Running SPADES')
+	for fq in range(len(r1_fastqs)): 
+		fq_name = (r1_fastqs[fq].split('_R')[0])
+		fq_name = fq_name.split('trimmed.')[1]
+		print('Running SPADES for ' + fq_name)
+		if args.paired: 
+			spades_cmd = 'spades.py ' + " -1 " + r1_fastqs[fq] + ' -2 ' + r2_fastqs[fq] +" -o " + fq_name 
+			subprocess.call(spades_cmd, shell = True, stderr = subprocess.DEVNULL, stdout = subprocess.DEVNULL)
+		else: 
+			spades_cmd = 'spades.py ' + " --s1 " + r1_fastqs[fq] + " -o " + fq_name 
+			subprocess.call(spades_cmd, shell = True, stderr = subprocess.DEVNULL, stdout = subprocess.DEVNULL)
+		logging.info(spades_cmd)
+
 print('Counting reads in fastq files')
 
 #Function to count lines in a file
@@ -103,7 +126,10 @@ for fq in r1_fastqs:
 		total_lines = file_len_zipped(fq)
 	else:
 		total_lines = file_len_unzipped(fq)
-	reads = 2 * (total_lines / 4)
+	if args.paired:
+		reads = 2 * (total_lines / 4)
+	if not args.paired:
+		reads = (total_lines / 4)
 	read_counts.append(reads)
 
 
@@ -126,7 +152,10 @@ mito_count.append('Mitochondrial reads')
 for fq in range(len(r1_fastqs)): 
 	fq_name = (r1_fastqs[fq].split('_R')[0])
 	out =  fq_name + '.mitochondria.sam'
-	cmd = 'bowtie2 -x mitochondria -p 8 --no-unal -1 ' + r1_fastqs[fq] + ' -2 ' + r2_fastqs[fq] + ' -S ' + out
+	if args.paired: 
+		cmd = 'bowtie2 -x mitochondria -p 8 --no-unal -1 ' + r1_fastqs[fq] + ' -2 ' + r2_fastqs[fq] + ' -S ' + out
+	else:
+		cmd = 'bowtie2 -x mitochondria -p 8 --no-unal -U ' + r1_fastqs[fq] +  ' -S ' + out
 	logging.info(cmd)
 	subprocess.call(cmd, shell = True, stderr = subprocess.DEVNULL)
 	mito_count.append(int(subprocess.check_output('cat '+ out + ' | wc -l ', shell = True).decode('utf-8').strip())-3)
@@ -150,7 +179,10 @@ ribosome_5_count.append('5s counts')
 for fq in range(len(r1_fastqs)): 
 	fq_name = (r1_fastqs[fq].split('_R')[0])
 	out =  fq_name + '.5s.sam'
-	cmd = 'bowtie2 -x 5s -p 8 --no-unal -1 ' + r1_fastqs[fq] + ' -2 ' + r2_fastqs[fq] + ' -S ' + out
+	if args.paired:
+		cmd = 'bowtie2 -x 5s -p 8 --no-unal -1 ' + r1_fastqs[fq] + ' -2 ' + r2_fastqs[fq] + ' -S ' + out
+	else: 
+		cmd = 'bowtie2 -x 5s -p 8 --no-unal -U ' + r1_fastqs[fq] + ' -S ' + out
 	logging.info(cmd)
 	subprocess.call(cmd, shell = True, stderr = subprocess.DEVNULL)
 	ribosome_5_count.append(int(subprocess.check_output('cat '+ out + ' | wc -l ', shell = True).decode('utf-8').strip())-3)
@@ -174,7 +206,10 @@ ribosome_18_count.append('18s counts')
 for fq in range(len(r1_fastqs)): 
 	fq_name = (r1_fastqs[fq].split('_R')[0])
 	out =  fq_name + '.18s.sam'
-	cmd = 'bowtie2 -x 18s -p 8 --no-unal -1 ' + r1_fastqs[fq] + ' -2 ' + r2_fastqs[fq] + ' -S ' + out
+	if args.paired:
+		cmd = 'bowtie2 -x 18s -p 8 --no-unal -1 ' + r1_fastqs[fq] + ' -2 ' + r2_fastqs[fq] + ' -S ' + out
+	else:
+		cmd = 'bowtie2 -x 18s -p 8 --no-unal -U ' + r1_fastqs[fq] + ' -S ' + out
 	logging.info(cmd)
 	subprocess.call(cmd, shell = True, stderr = subprocess.DEVNULL)
 	ribosome_18_count.append(int(subprocess.check_output('cat '+ out + ' | wc -l ', shell = True).decode('utf-8').strip())-3)
@@ -198,7 +233,10 @@ ribosome_28_count.append('28s counts')
 for fq in range(len(r1_fastqs)): 
 	fq_name = (r1_fastqs[fq].split('_R')[0])
 	out =  fq_name + '.28s.sam'
-	cmd = 'bowtie2 -x 28s -p 8 --no-unal -1 ' + r1_fastqs[fq] + ' -2 ' + r2_fastqs[fq] + ' -S ' + out
+	if args.paired:
+		cmd = 'bowtie2 -x 28s -p 8 --no-unal -1 ' + r1_fastqs[fq] + ' -2 ' + r2_fastqs[fq] + ' -S ' + out
+	else:
+		cmd = 'bowtie2 -x 28s -p 8 --no-unal -U ' + r1_fastqs[fq] + ' -S ' + out
 	logging.info(cmd)
 	subprocess.call(cmd, shell = True, stderr = subprocess.DEVNULL)
 	ribosome_28_count.append(int(subprocess.check_output('cat '+ out + ' | wc -l ', shell = True).decode('utf-8').strip())-3)
