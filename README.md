@@ -17,7 +17,7 @@ All paired end FASTQ files in the folder with the python script will be run thro
 The required reference sequences for the `Bowtie2`  alignment and adapters.fa for the trimming will be automatically downloaded and built by the script. The only file that must be provided is for the optional kallisto alignment: [Transcriptome.idx](https://github.com/pachterlab/kallisto-transcriptome-indices/releases/download/ensembl-96/homo_sapiens.tar.gz). 
 
 ### Flags: 
-* --paired <True/False> ### Required
+* --paired <True/False> Required! 
 * --trimmomatic "< Any Trimmomatic options to be entered after the 'trimmomatic PE' command>" 
 * --kallisto "<Any Kallisto options to be entered following 'kallisto quant'>" 
 * --Debrowser <True/False>
