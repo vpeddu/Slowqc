@@ -25,4 +25,4 @@ The required reference sequences for the `Bowtie2`  alignment and adapters.fa fo
 * --spades <True/False> 
 
 ### Example command: 
-`python slowqc.py --paired True --trimmomatic "-phred33 -threads 8 ILLUMINACLIP:adapters.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:75" --kallisto "-i ~/bin/homo_sapiens/transcriptome.idx --threads 8" --debrowser True --spades True` 
+`python3 slowqc.py --paired True --trimmomatic "-phred33 -threads 8 ILLUMINACLIP:adapters.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:75" --kallisto "-i ~/bin/homo_sapiens/transcriptome.idx --threads 8" --debrowser True --spades True` 
