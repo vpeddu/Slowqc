@@ -10,7 +10,7 @@ This script accepts untrimmed FASTQ files and performs the following:
 
 ## Running the pipeline 
 
-All paired end FASTQ files in the folder with the python script will be run through the pipeline. Wildcard searches are used to distinguish R1 and R2 files, so they must have "R1" and "R2" in their filenames. `Trimmomatic`, `Bowtie2`, `Kallisto`, and `SPADES` must be installed and added to `$PATH`. The python script pulls from NCBI and the bin folder located inside this repo. As a result internet access is required to run this script. 
+All paired end FASTQ files in the folder with the python script will be run through the pipeline. Wildcard searches are used to distinguish R1 and R2 files, so they must have "R1" and "R2" in their filenames. `Trimmomatic`, `Bowtie2`, `Kallisto`, and `SPADES` must be installed and added to `$PATH`. The python script pulls from NCBI and the bin folder located inside this repo. As a result internet access is required to run this script. `DEBrowser` must be installed in your default R environment as well.
 
 #### *If all of this is fine all you have to do is place the python script in the folder of FASTQ files* 
 
