@@ -134,7 +134,7 @@ for fq in r1_fastqs:
 	read_counts.append(reads)
 
 
-cores_available = multiprocessing.cpu_count() 
+cores_available = str(multiprocessing.cpu_count())
 print('Counting mitochondrial reads')
 
 #Mitochondrial reference genome. If you want to change this change the id argument to your favorite reference
