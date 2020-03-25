@@ -12,6 +12,7 @@ import logging
 import argparse
 import subprocess
 import urllib.request
+import multiprocessing
 from Bio import Entrez
 from functools import reduce
 Entrez.email = "vpeddu@uw.edu"
@@ -133,7 +134,7 @@ for fq in r1_fastqs:
 	read_counts.append(reads)
 
 
-
+cores_available = multiprocessing.cpu_count() 
 print('Counting mitochondrial reads')
 
 #Mitochondrial reference genome. If you want to change this change the id argument to your favorite reference
@@ -153,9 +154,9 @@ for fq in range(len(r1_fastqs)):
 	fq_name = (r1_fastqs[fq].split('_R')[0])
 	out =  fq_name + '.mitochondria.sam'
 	if args.paired: 
-		cmd = 'bowtie2 -x mitochondria -p 8 --no-unal -1 ' + r1_fastqs[fq] + ' -2 ' + r2_fastqs[fq] + ' -S ' + out
+		cmd = 'bowtie2 -x mitochondria --no-unal -1 ' + r1_fastqs[fq] + ' -2 ' + r2_fastqs[fq] + ' ' + cores_available + ' -S ' + out
 	else:
-		cmd = 'bowtie2 -x mitochondria -p 8 --no-unal -U ' + r1_fastqs[fq] +  ' -S ' + out
+		cmd = 'bowtie2 -x mitochondria -p 8 --no-unal -U ' + r1_fastqs[fq] +  ' ' + cores_available + ' -S ' + out
 	logging.info(cmd)
 	subprocess.call(cmd, shell = True, stderr = subprocess.DEVNULL)
 	mito_count.append(int(subprocess.check_output('cat '+ out + ' | wc -l ', shell = True).decode('utf-8').strip())-3)
@@ -180,9 +181,9 @@ for fq in range(len(r1_fastqs)):
 	fq_name = (r1_fastqs[fq].split('_R')[0])
 	out =  fq_name + '.5s.sam'
 	if args.paired:
-		cmd = 'bowtie2 -x 5s -p 8 --no-unal -1 ' + r1_fastqs[fq] + ' -2 ' + r2_fastqs[fq] + ' -S ' + out
+		cmd = 'bowtie2 -x 5s -p 8 --no-unal -1 ' + r1_fastqs[fq] + ' -2 ' + r2_fastqs[fq] + ' ' + cores_available + ' -S ' + out
 	else: 
-		cmd = 'bowtie2 -x 5s -p 8 --no-unal -U ' + r1_fastqs[fq] + ' -S ' + out
+		cmd = 'bowtie2 -x 5s -p 8 --no-unal -U ' + r1_fastqs[fq] +  ' ' + cores_available + ' -S ' + out
 	logging.info(cmd)
 	subprocess.call(cmd, shell = True, stderr = subprocess.DEVNULL)
 	ribosome_5_count.append(int(subprocess.check_output('cat '+ out + ' | wc -l ', shell = True).decode('utf-8').strip())-3)
@@ -207,9 +208,9 @@ for fq in range(len(r1_fastqs)):
 	fq_name = (r1_fastqs[fq].split('_R')[0])
 	out =  fq_name + '.18s.sam'
 	if args.paired:
-		cmd = 'bowtie2 -x 18s -p 8 --no-unal -1 ' + r1_fastqs[fq] + ' -2 ' + r2_fastqs[fq] + ' -S ' + out
+		cmd = 'bowtie2 -x 18s -p 8 --no-unal -1 ' + r1_fastqs[fq] + ' -2 ' + r2_fastqs[fq] + ' ' + cores_available + ' -S ' + out
 	else:
-		cmd = 'bowtie2 -x 18s -p 8 --no-unal -U ' + r1_fastqs[fq] + ' -S ' + out
+		cmd = 'bowtie2 -x 18s -p 8 --no-unal -U ' + r1_fastqs[fq] +  ' ' + cores_available + ' -S ' + out
 	logging.info(cmd)
 	subprocess.call(cmd, shell = True, stderr = subprocess.DEVNULL)
 	ribosome_18_count.append(int(subprocess.check_output('cat '+ out + ' | wc -l ', shell = True).decode('utf-8').strip())-3)
@@ -234,9 +235,9 @@ for fq in range(len(r1_fastqs)):
 	fq_name = (r1_fastqs[fq].split('_R')[0])
 	out =  fq_name + '.28s.sam'
 	if args.paired:
-		cmd = 'bowtie2 -x 28s -p 8 --no-unal -1 ' + r1_fastqs[fq] + ' -2 ' + r2_fastqs[fq] + ' -S ' + out
+		cmd = 'bowtie2 -x 28s -p 8 --no-unal -1 ' + r1_fastqs[fq] + ' -2 ' + r2_fastqs[fq] + ' ' + cores_available + ' -S ' + out
 	else:
-		cmd = 'bowtie2 -x 28s -p 8 --no-unal -U ' + r1_fastqs[fq] + ' -S ' + out
+		cmd = 'bowtie2 -x 28s -p 8 --no-unal -U ' + r1_fastqs[fq] +  ' ' + cores_available + ' -S ' + out
 	logging.info(cmd)
 	subprocess.call(cmd, shell = True, stderr = subprocess.DEVNULL)
 	ribosome_28_count.append(int(subprocess.check_output('cat '+ out + ' | wc -l ', shell = True).decode('utf-8').strip())-3)
