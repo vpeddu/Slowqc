@@ -10,6 +10,9 @@ https://github.com/vpeddu/slowqc
 */
 
 // Using the Nextflow DSL-2 to account for the logic flow of this workflow
+//test command
+//nextflow run main.nf --INPUT /Users/gerbix/Documents/vikas/slowqc/test_data/paired/  -with-docker ubuntu:18.04 --OUTDIR test/ --PAIRED --KALLISTO "/Users/gerbix/Documents/vikas/bin/grch38_transcriptome_kallisto_index/transcriptome.idx" -with-trace -resume 
+
 nextflow.preview.dsl=2
 
 
@@ -59,7 +62,8 @@ params.KALLISTO_ARGS = ""
  */
 
 include trim_files from './Modules.nf'
-include kallisto from './Modules.nf'
+include kallisto_qc from './Modules.nf'
+include kallisto_human from './Modules.nf'
 
 
 
@@ -94,15 +98,22 @@ workflow {
     trim_files( 
         input_read_ch
     )
-    if(params.KALLISTO)
-    kallisto(
+
+    kallisto_qc( 
+        trim_files.out[0]
+    )
+
+    if(params.KALLISTO) { 
+    kallisto_human(
         trim_files.out[0],
         file(params.KALLISTO),
         params.KALLISTO_ARGS
     )
+
+    }
     //end PAIRED
     } 
     publish:
-        kallisto.out to: "${params.OUTDIR}" , mode: 'copy'
+        kallisto_qc.out to: "${params.OUTDIR}" , mode: 'copy'
 }      
 

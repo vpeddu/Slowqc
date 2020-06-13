@@ -49,7 +49,32 @@ bbduk.sh \
 """
 }
 
-process kallisto { 
+
+process kallisto_qc { 
+	container "quay.io/biocontainers/kallisto:0.46.2--h4f7b962_1"
+
+    input:
+      tuple file(r1), file(r2)
+
+    output:
+      tuple file("${r1}"), file("${r2}"), file("*.QC")
+ script:
+
+      """
+#!/bin/bash
+	folderName=`basename ${r1} "_1.fastq.gz"`
+	echo \$folderName
+	kallisto quant -i ${baseDir}/bin/qc_idx.idx -t ${task.cpus} -o \$folderName ${r1} ${r2}
+
+	# find and rename the kallisto files
+	for i in `find . -name *.tsv`; do  temp=`echo \$i | cut -d / -f2`; newfilename="\$temp"".tsv";echo \$newfilename; echo \$temp; cp \$temp/abundance.tsv \$newfilename.QC; done
+
+
+"""
+}
+
+
+process kallisto_human { 
 	container "quay.io/biocontainers/kallisto:0.46.2--h4f7b962_1"
 
     input:
@@ -69,7 +94,28 @@ process kallisto {
 
 	# find and rename the kallisto files
 	for i in `find . -name *.tsv`; do  temp=`echo \$i | cut -d / -f2`; newfilename="\$temp"".tsv";echo \$newfilename; echo \$temp; cp \$temp/abundance.tsv \$newfilename; done
+"""
+}
 
+process DEbrowser { 
+    container "quay.io/vpeddu/rgeneratesummary:latest"
 
+    input:
+      tuple file(r1), file(r2)
+	  file kallistoIndex
+	  val kallistoArgs
+
+    output:
+      tuple file("${r1}"), file("${r2}"), file("*.tsv")
+ script:
+
+      """
+#!/bin/bash
+	folderName=`basename ${r1} "_1.fastq.gz"`
+	echo \$folderName
+	kallisto quant -i ${kallistoIndex} ${kallistoArgs} -t ${task.cpus} -o \$folderName ${r1} ${r2}
+
+	# find and rename the kallisto files
+	for i in `find . -name *.tsv`; do  temp=`echo \$i | cut -d / -f2`; newfilename="\$temp"".tsv";echo \$newfilename; echo \$temp; cp \$temp/abundance.tsv \$newfilename; done
 """
 }
