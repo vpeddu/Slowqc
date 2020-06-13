@@ -64,6 +64,7 @@ params.KALLISTO_ARGS = ""
 include trim_files from './Modules.nf'
 include kallisto_qc from './Modules.nf'
 include kallisto_human from './Modules.nf'
+include DEbrowser from './Modules.nf'
 
 
 
@@ -109,11 +110,14 @@ workflow {
         file(params.KALLISTO),
         params.KALLISTO_ARGS
     )
+    DEbrowser ( 
+        kallisto_human.out[1].collect()
 
+    )
     }
     //end PAIRED
     } 
     publish:
-        kallisto_qc.out to: "${params.OUTDIR}" , mode: 'copy'
+        DEbrowser.out to: "${params.OUTDIR}" , mode: 'copy'
 }      
 

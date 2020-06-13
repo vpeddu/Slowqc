@@ -75,7 +75,7 @@ process kallisto_qc {
 
 
 process kallisto_human { 
-	container "quay.io/biocontainers/kallisto:0.46.2--h4f7b962_1"
+	//container "quay.io/biocontainers/kallisto:0.46.2--h4f7b962_1"
 
     input:
       tuple file(r1), file(r2)
@@ -83,7 +83,8 @@ process kallisto_human {
 	  val kallistoArgs
 
     output:
-      tuple file("${r1}"), file("${r2}"), file("*.tsv")
+      tuple file("${r1}"), file("${r2}")
+	  file "*.tsv"
  script:
 
       """
@@ -101,21 +102,15 @@ process DEbrowser {
     container "quay.io/vpeddu/rgeneratesummary:latest"
 
     input:
-      tuple file(r1), file(r2)
-	  file kallistoIndex
-	  val kallistoArgs
+    file(tsv_list)
 
     output:
-      tuple file("${r1}"), file("${r2}"), file("*.tsv")
+      file "DEBrowser_input.txt"
  script:
 
       """
-#!/bin/bash
-	folderName=`basename ${r1} "_1.fastq.gz"`
-	echo \$folderName
-	kallisto quant -i ${kallistoIndex} ${kallistoArgs} -t ${task.cpus} -o \$folderName ${r1} ${r2}
+	#!/bin/bash
+	rscript --vanilla ${baseDir}/bin/generate_debrowser.r . ${baseDir}/bin/transcripts_to_genes.txt
 
-	# find and rename the kallisto files
-	for i in `find . -name *.tsv`; do  temp=`echo \$i | cut -d / -f2`; newfilename="\$temp"".tsv";echo \$newfilename; echo \$temp; cp \$temp/abundance.tsv \$newfilename; done
 """
 }
