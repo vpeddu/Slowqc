@@ -65,7 +65,7 @@ include trim_files from './Modules.nf'
 include kallisto_qc from './Modules.nf'
 include kallisto_human from './Modules.nf'
 include DEbrowser from './Modules.nf'
-
+include Final from './Modules.nf'
 
 
 // Error handling for input flags
@@ -112,12 +112,20 @@ workflow {
     )
     DEbrowser ( 
         kallisto_human.out[1].collect()
+    )
+
+    Final( 
+        trim_files.out.toList(), 
+        kallisto_qc.out[0].collect(),
+        DEbrowser.out[0],
+        kallisto_human.out[1].collect()
 
     )
+
     }
     //end PAIRED
     } 
     publish:
-        DEbrowser.out to: "${params.OUTDIR}" , mode: 'copy'
+        Final.out to: "${params.OUTDIR}" , mode: 'copy'
 }      
 

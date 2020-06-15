@@ -57,14 +57,14 @@ process kallisto_qc {
       tuple file(r1), file(r2)
 
     output:
-      tuple file("${r1}"), file("${r2}"), file("*.QC")
+      file "*.QC"
  script:
 
       """
 #!/bin/bash
 	folderName=`basename ${r1} "_1.fastq.gz"`
 	echo \$folderName
-	kallisto quant -i ${baseDir}/bin/qc_idx.idx -t ${task.cpus} -o \$folderName ${r1} ${r2}
+	kallisto quant -i ${baseDir}/bin/qc_idx -t ${task.cpus} -o \$folderName ${r1} ${r2}
 
 	# find and rename the kallisto files
 	for i in `find . -name *.tsv`; do  temp=`echo \$i | cut -d / -f2`; newfilename="\$temp"".tsv";echo \$newfilename; echo \$temp; cp \$temp/abundance.tsv \$newfilename.QC; done
@@ -75,7 +75,7 @@ process kallisto_qc {
 
 
 process kallisto_human { 
-	//container "quay.io/biocontainers/kallisto:0.46.2--h4f7b962_1"
+	container "quay.io/biocontainers/kallisto:0.46.2--h4f7b962_1"
 
     input:
       tuple file(r1), file(r2)
@@ -88,7 +88,7 @@ process kallisto_human {
  script:
 
       """
-#!/bin/bash
+	#!/bin/bash
 	folderName=`basename ${r1} "_1.fastq.gz"`
 	echo \$folderName
 	kallisto quant -i ${kallistoIndex} ${kallistoArgs} -t ${task.cpus} -o \$folderName ${r1} ${r2}
@@ -106,11 +106,57 @@ process DEbrowser {
 
     output:
       file "DEBrowser_input.txt"
+
  script:
 
       """
 	#!/bin/bash
-	rscript --vanilla ${baseDir}/bin/generate_debrowser.r . ${baseDir}/bin/transcripts_to_genes.txt
+
+	ls -lah
+
+	Rscript --vanilla ${baseDir}/bin/generate_debrowser.r . ${baseDir}/bin/transcripts_to_genes.txt
 
 """
+}
+
+process Final { 
+	container "quay.io/wshands/fastqc"
+
+	input: 
+		tuple file(r1), file(r2)
+		file qcfile
+		file(DEBrowser_input)
+		file(tsv_list)
+		
+	output: 
+		file "sample_counts.csv"
+		file "trimmed_files"
+		file "fastqc_output"
+	script:
+	"""
+	#!/bin/bash
+
+	ls -lah 
+
+	echo "Sample,Mitochondrial,Ribosomal,Human, Total" >> sample_counts.csv
+
+	for i in *.tsv; do  temp=`basename \$i .tsv` ; temp_fastq="\$temp""_1.fastq.gz"
+	echo -n "\$temp," >> sample_counts.csv
+	echo -n `cut -f1,4  \$temp.tsv.QC  | grep MN046426.1 | cut -f2` >> sample_counts.csv ; echo -n , >> sample_counts.csv
+	echo -n `cut -f1,4  \$temp.tsv.QC  | grep "NR"  | cut -f2 | awk '{s+=\$1} END {print s}'`>> sample_counts.csv ; echo -n , >> sample_counts.csv
+	echo -n `cut -f4  \$temp.tsv  | awk '{s+=\$1} END {print s}'` >> sample_counts.csv ; echo -n , >> sample_counts.csv
+	zgrep -c "^+\$" \$temp_fastq >> sample_counts.csv
+	done
+
+	
+	mkdir fastqc_output
+	for i in *_1.fastq.gz* ; do fastqc \$i ; done
+	mv *_fastqc* fastqc_output
+
+
+	mkdir trimmed_files
+	mv *.gz trimmed_files
+
+	"""
+
 }
