@@ -13,11 +13,11 @@ This script accepts untrimmed FASTQ files and performs the following:
 This pipeline is written in `NextFlow` and uses `Docker` containers to simplify workflow execution. To run, `Nextflow` and `Docker` must be installed. At runtime `Docker` must be running. 
 
 ### Flags: 
-* --INPUT "<Input folder>"
-* --OUTDIR "<Output results go here>"
-* --PAIRED "<Files are paired. Filenames must have "_1" and "_2" if true. Default: FALSE>" 
-* --TRANSCRIPTOME "<path to Kallisto transcriptome index>" 
-* --KALLISTO_ARGS "<Arguments to pass to Kallisto. If running single end, `-s` and `-l` must be specified (both int)>
+* --INPUT           Input folder
+* --OUTDIR          Output results go here
+* --PAIRED Files    Are paired. Filenames must have "_1" and "_2" if true. Default: FALSE
+* --TRANSCRIPTOME   Path to Kallisto transcriptome index
+* --KALLISTO_ARGS   Arguments to pass to Kallisto. If running single end, `-s` and `-l` must be specified (both int)
 
 ### Example commands: 
 #### Single end: 
