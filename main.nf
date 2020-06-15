@@ -104,7 +104,6 @@ workflow {
         trim_files.out[0]
     )
 
-    if(params.KALLISTO) { 
     kallisto_human(
         trim_files.out[0],
         file(params.KALLISTO),
@@ -122,7 +121,7 @@ workflow {
 
     )
 
-    }
+    
     //end PAIRED
     } 
     publish:
