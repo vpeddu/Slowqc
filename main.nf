@@ -100,7 +100,7 @@ workflow {
         //fml() 
         if(params.PAIRED){ 
         input_read_ch = Channel
-            .fromFilePairs("${params.INPUT}*_R{1,2}*.gz")
+            .fromFilePairs("${params.INPUT}*_*{1,2}*.gz")
             .ifEmpty { error "Cannot find any FASTQ pairs in ${params.INPUT} ending with .gz" }
             .map { it -> [it[0], it[1][0], it[1][1]]}
         } else { 
