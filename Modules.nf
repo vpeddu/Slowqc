@@ -72,6 +72,7 @@ echo "Processing \$sample_name"
 
 echo "Masking ${r1}"
 bbduk.sh \
+-Xmx4g \
     in=${r1} \
 	in2=${r2} \
     out=${r1}.trimmed.fastq.gz \
