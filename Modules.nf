@@ -71,6 +71,11 @@ echo "Processing \$sample_name"
 
 
 echo "Masking ${r1}"
+
+ls /usr/local/bin/
+
+which bbduk.sh
+
 /usr/local/bin/bbduk.sh \
     in=${r1} \
 	in2=${r2} \
