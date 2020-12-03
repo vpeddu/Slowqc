@@ -121,7 +121,7 @@ process kallisto_qc_PE {
 
       """
 #!/bin/bash
-	folderName=`basename ${r1} "_1.fastq.gz"`
+	folderName=`basename ${r1} "_R1_001.fastq.gz"`
 	echo \$folderName
 	kallisto quant -i ${baseDir}/bin/qc_idx -t ${task.cpus} -o \$folderName ${r1} ${r2}
 
@@ -172,7 +172,7 @@ process kallisto_human_PE {
 
       """
 	#!/bin/bash
-	folderName=`basename ${r1} "_R1.fastq.gz"`
+	folderName=`basename ${r1} "_R1_001.fastq.gz"`
 	echo \$folderName
 	kallisto quant -i ${kallistoIndex} ${kallistoArgs} -t ${task.cpus} -o \$folderName ${r1} ${r2}
 
