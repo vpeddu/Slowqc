@@ -172,7 +172,7 @@ process kallisto_human_PE {
 
       """
 	#!/bin/bash
-	folderName=`basename ${r1} "_1.fastq.gz"`
+	folderName=`basename ${r1} "_R1.fastq.gz"`
 	echo \$folderName
 	kallisto quant -i ${kallistoIndex} ${kallistoArgs} -t ${task.cpus} -o \$folderName ${r1} ${r2}
 
@@ -272,7 +272,7 @@ process Final_PE {
 
 	echo "Sample,Mitochondrial,Ribosomal,Human, Total" >> sample_counts.csv
 
-	for i in *.tsv; do  temp=`basename \$i .tsv` ; temp_fastq="\$temp""_1.fastq.gz"
+	for i in *.tsv; do  temp=`basename \$i .tsv` ; temp_fastq="\$temp""_R1.fastq.gz"
 	echo -n "\$temp," >> sample_counts.csv
 	echo -n `cut -f1,4  \$temp.tsv.QC  | grep MN046426.1 | cut -f2` >> sample_counts.csv ; echo -n , >> sample_counts.csv
 	echo -n `cut -f1,4  \$temp.tsv.QC  | grep "NR"  | cut -f2 | awk '{s+=\$1} END {print s}'`>> sample_counts.csv ; echo -n , >> sample_counts.csv
