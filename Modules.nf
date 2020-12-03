@@ -45,7 +45,7 @@ bbduk.sh \
 
 process trim_files_PE {
 
-    container "quay.io/biocontainers/bbmap:38.76--h516909a_0"
+//    container "quay.io/biocontainers/bbmap:38.76--h516909a_0"
 
     input:
       tuple val(prefix), file(r1), file(r2)
